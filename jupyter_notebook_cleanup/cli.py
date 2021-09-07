@@ -13,7 +13,7 @@ def parse_args():
     psr = argparse.ArgumentParser()
     psr.add_argument("files", nargs="*", help="ipynb files")
     psr.add_argument("--dry-run", action="store_true", default=False)
-    psr.add_argument("--remove-kernel-metadata", action="store_true", default=False)
+    psr.add_argument("--remove-metadata", action="store_true", default=False)
     psr.add_argument(
         "-p", "--pin-patterns", default="[pin]", help="semicolon-separated patterns (wildcards are not supported)"
     )
@@ -25,7 +25,7 @@ def main():
     patterns = args.pin_patterns.split(";")
     for path in args.files:
         remove_output_file(
-            path, patterns=patterns, remove_kernel_metadata=args.remove_kernel_metadata, preview=args.dry_run
+            path, patterns=patterns, remove_metadata=args.remove_metadata, preview=args.dry_run
         )
 
 
@@ -63,14 +63,10 @@ def remove_output_file(path, patterns, remove_kernel_metadata, preview):
         shutil.copystat(tpath, path)  # copy original timestamps
 
 
-def remove_output_object(data, patterns, remove_kernel_metadata):
+def remove_output_object(data, patterns, remove_metadata):
     new_data = copy.deepcopy(data)
-    if remove_kernel_metadata:
-        kernelspec = new_data.get("metadata", {}).get("kernelspec", {})
-        if "display_name" in kernelspec:
-            kernelspec["display_name"] = ""
-        if "name" in kernelspec:
-            kernelspec["name"] = ""
+    if remove_metadata:
+        new_data["metadata"] = {}
     for cell in new_data["cells"]:
         if "execution_count" in cell:
             cell["execution_count"] = None
