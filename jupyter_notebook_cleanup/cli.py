@@ -94,7 +94,11 @@ class JupyterNotebookCleanup:
             self.remove_output_file(path)
 
 
-if __name__ == "__main__":
+def main():
     args = JupyterNotebookCleanup.parse_args()
     jnc = JupyterNotebookCleanup(**vars(args))
     jnc.run()
+
+if __name__ == "__main__":
+    main()
+    
